@@ -15,6 +15,7 @@ export const useTripStore = defineStore("trip", {
     currentItinerary: null, // Dane harmonogramu
     itineraryDays: [],
     itineraryPlaces: [],
+    baseUrl: import.meta.env.VITE_API_BASE_URL,
   }),
   actions: {
     setCurrentTrip(tripId) {
@@ -28,8 +29,8 @@ export const useTripStore = defineStore("trip", {
     },    
     async fetchTrips() {
       try {
-        await axios.get("http://localhost:8000/sanctum/csrf-cookie");
-        const response = await axios.get("http://localhost:8000/api/trips"); // Pobieranie tripów
+        await axios.get(`${this.baseUrl}sanctum/csrf-cookie`);
+        const response = await axios.get(`${this.baseUrl}/api/trips`); // Pobieranie tripów
         // Poniżej konwersja z snake_case do camelCase podczas pobierania tripów z bazy, ponieważ w moim froncie wszystkie zmienne używają camelCase natomiast w bazie używany jest snake_case
         this.trips = response.data.map(trip => 
           _.mapKeys(trip, (value, key) => _.camelCase(key))
@@ -41,7 +42,7 @@ export const useTripStore = defineStore("trip", {
    
     async addTrip(tripData) {
       try {
-        await axios.get("http://localhost:8000/sanctum/csrf-cookie");
+        await axios.get(`${this.baseUrl}sanctum/csrf-cookie`);
 
         // Konwersja z camelCase używanego w Frontendzie na snake_case używanego w bazie danych
         const snakeCaseData = {};
@@ -54,7 +55,7 @@ export const useTripStore = defineStore("trip", {
           document.cookie.split('; ').find(row => row.startsWith('XSRF-TOKEN=')).split('=')[1]
         );
         const response = await axios.post(
-          "http://localhost:8000/api/trips",
+          `${this.baseUrl}/api/trips`,
           snakeCaseData,  // Dane przesyłane w formacie JSON
           {
             headers: {
@@ -74,14 +75,14 @@ export const useTripStore = defineStore("trip", {
     async deleteTrip(tripId) {
       try {
         // Pobranie tokena CSRF wymagane przez Laravel do zabezpieczenia żądań
-        await axios.get("http://localhost:8000/sanctum/csrf-cookie");  
+        await axios.get(`${this.baseUrl}sanctum/csrf-cookie`);  
         
          // Odczytanie wartości tokena CSRF z ciasteczek
         const csrfToken = decodeURIComponent(
           document.cookie.split('; ').find(row => row.startsWith('XSRF-TOKEN=')).split('=')[1]
         );
         // Wysłanie żądania DELETE w celu usunięcia wycieczki
-        await axios.delete(`http://localhost:8000/api/trips/${tripId}`, {
+        await axios.delete(`${this.baseUrl}/api/trips/${tripId}`, {
           headers: {
             'X-XSRF-TOKEN': csrfToken // Przekazanie tokena CSRF w nagłówkach żądania
           },
@@ -96,7 +97,7 @@ export const useTripStore = defineStore("trip", {
 
     async updateTrip(tripData) {
       try {
-          await axios.get("http://localhost:8000/sanctum/csrf-cookie");
+          await axios.get(`${this.baseUrl}sanctum/csrf-cookie`);
   
           // Konwersja z camelCase do snake_case dla danych
           const snakeCaseData = _.mapKeys(tripData, (value, key) => _.snakeCase(key));
@@ -105,7 +106,7 @@ export const useTripStore = defineStore("trip", {
               document.cookie.split('; ').find(row => row.startsWith('XSRF-TOKEN=')).split('=')[1]
           );
   
-          const response = await axios.put(`http://localhost:8000/api/trips/${tripData.id}`, snakeCaseData, {
+          const response = await axios.put(`${this.baseUrl}/api/trips/${tripData.id}`, snakeCaseData, {
               headers: {
                   'X-XSRF-TOKEN': csrfToken,
                   'Content-Type': 'application/json'
@@ -127,7 +128,7 @@ export const useTripStore = defineStore("trip", {
 
   async addPlaceToVisit(place, tripId) {
     try {
-      await axios.get("http://localhost:8000/sanctum/csrf-cookie");
+      await axios.get(`${this.baseUrl}sanctum/csrf-cookie`);
   
       const requestData = {
         trip_id: this.currentTripId,
@@ -146,7 +147,7 @@ export const useTripStore = defineStore("trip", {
         document.cookie.split('; ').find((row) => row.startsWith('XSRF-TOKEN=')).split('=')[1]
       );
   
-      const response = await axios.post('http://localhost:8000/api/places-to-visit', snakeCaseData, {
+      const response = await axios.post(`${this.baseUrl}/api/places-to-visit`, snakeCaseData, {
         headers: {
           'X-XSRF-TOKEN': csrfToken,
           'Content-Type': 'application/json',
@@ -170,7 +171,7 @@ export const useTripStore = defineStore("trip", {
 
   async fetchPlacesToVisit(tripId) {
     try {
-      const response = await axios.get("http://localhost:8000/api/places-to-visit", {
+      const response = await axios.get(`${this.baseUrl}/api/places-to-visit`, {
         params: { trip_id: tripId },
       });
   
@@ -191,7 +192,7 @@ export const useTripStore = defineStore("trip", {
 
   async fetchSingleTrip(tripId) {
     try {
-      const response = await axios.get(`http://localhost:8000/api/trips/${tripId}`);
+      const response = await axios.get(`${this.baseUrl}/api/trips/${tripId}`);
       const trip = _.mapKeys(response.data, (value, key) => _.camelCase(key));
       this.trips.push(trip); // Dodajemy do stanu, jeśli trip nie istnieje
       return trip;
@@ -203,14 +204,14 @@ export const useTripStore = defineStore("trip", {
 
   async deletePlace(placeId) {
     try {
-      await axios.get("http://localhost:8000/sanctum/csrf-cookie"); // Pobierz CSRF cookie
+      await axios.get(`${this.baseUrl}sanctum/csrf-cookie`); // Pobierz CSRF cookie
         
         const csrfToken = decodeURIComponent(
           document.cookie.split('; ').find(row => row.startsWith('XSRF-TOKEN=')).split('=')[1]
         );
 
 
-      await axios.delete(`http://localhost:8000/api/places-to-visit/${placeId}`,  {
+      await axios.delete(`${this.baseUrl}/api/places-to-visit/${placeId}`,  {
         headers: {
           'X-XSRF-TOKEN': csrfToken
         },
@@ -224,7 +225,7 @@ export const useTripStore = defineStore("trip", {
 
   async updatePlace(placeId, updatedData) {
     try {
-      await axios.get("http://localhost:8000/sanctum/csrf-cookie");
+      await axios.get(`${this.baseUrl}sanctum/csrf-cookie`);
   
           // Konwersja z camelCase do snake_case dla danych
           const snakeCaseData = _.mapKeys(updatedData, (value, key) => _.snakeCase(key));
@@ -238,7 +239,7 @@ export const useTripStore = defineStore("trip", {
           console.log(`Preparing to update place ${placeId} with data:`, snakeCaseData);
 
       const response = await axios.patch(
-        `http://localhost:8000/api/places-to-visit/${placeId}`, snakeCaseData, {
+        `${this.baseUrl}/api/places-to-visit/${placeId}`, snakeCaseData, {
           headers: {
               'X-XSRF-TOKEN': csrfToken,
               'Content-Type': 'application/json'
@@ -258,7 +259,7 @@ export const useTripStore = defineStore("trip", {
     try {
       console.log("Assigning hotel:", hotel); // Log całego obiektu hotel
   
-      await axios.get("http://localhost:8000/sanctum/csrf-cookie");
+      await axios.get(`${this.baseUrl}sanctum/csrf-cookie`);
   
       const requestData = {
         trip_id: this.currentTripId,
@@ -280,7 +281,7 @@ export const useTripStore = defineStore("trip", {
       const snakeCaseData = _.mapKeys(requestData, (value, key) => _.snakeCase(key));
       console.log("Request data after snakeCase transformation:", snakeCaseData);
   
-      const response = await axios.post('http://localhost:8000/api/hotels', snakeCaseData, {
+      const response = await axios.post(`${this.baseUrl}/api/hotels`, snakeCaseData, {
         headers: {
           'X-XSRF-TOKEN': csrfToken,
           'Content-Type': 'application/json',
@@ -298,7 +299,7 @@ export const useTripStore = defineStore("trip", {
 
   async fetchHotels(tripId) {
     try {
-      const response = await axios.get("http://localhost:8000/api/hotels", {
+      const response = await axios.get(`${this.baseUrl}/api/hotels`, {
         params: { trip_id: tripId },
       });
       this.hotels = response.data;
@@ -310,13 +311,13 @@ export const useTripStore = defineStore("trip", {
   
   async deleteHotel(hotelId) {
     try {
-      await axios.get("http://localhost:8000/sanctum/csrf-cookie"); // Pobierz CSRF cookie
+      await axios.get(`${this.baseUrl}sanctum/csrf-cookie`); // Pobierz CSRF cookie
         
         const csrfToken = decodeURIComponent(
           document.cookie.split('; ').find(row => row.startsWith('XSRF-TOKEN=')).split('=')[1]
         );
 
-      await axios.delete(`http://localhost:8000/api/hotels/${hotelId}`,   {
+      await axios.delete(`${this.baseUrl}/api/hotels/${hotelId}`,   {
         headers: {
           'X-XSRF-TOKEN': csrfToken
         },
@@ -333,7 +334,7 @@ export const useTripStore = defineStore("trip", {
   async addItinerary(startDate, endDate) {
     try {
       // Zapewnienie, że CSRF token jest odświeżony
-      await axios.get("http://localhost:8000/sanctum/csrf-cookie");
+      await axios.get(`${this.baseUrl}sanctum/csrf-cookie`);
   
       const requestData = {
         trip_id: this.currentTripId, // Trip ID przypisany do harmonogramu
@@ -351,7 +352,7 @@ export const useTripStore = defineStore("trip", {
 
       // Wysyłanie żądania POST do API
       const response = await axios.post(
-        "http://localhost:8000/api/itineraries",
+        `${this.baseUrl}/api/itineraries`,
         snakeCaseData, // Nie trzeba konwertować kluczy, jeśli API oczekuje snake_case
         {
           headers: {
@@ -372,7 +373,7 @@ export const useTripStore = defineStore("trip", {
 
   async addItineraryNote(note) {
     try {
-      await axios.get("http://localhost:8000/sanctum/csrf-cookie");
+      await axios.get(`${this.baseUrl}sanctum/csrf-cookie`);
   
       const snakeCaseData = _.mapKeys(note, (value, key) => _.snakeCase(key));
   
@@ -380,7 +381,7 @@ export const useTripStore = defineStore("trip", {
         document.cookie.split("; ").find((row) => row.startsWith("XSRF-TOKEN=")).split("=")[1]
       );
   
-      const response = await axios.post("http://localhost:8000/api/itinerary-notes", snakeCaseData, {
+      const response = await axios.post(`${this.baseUrl}/api/itinerary-notes`, snakeCaseData, {
         headers: {
           "X-XSRF-TOKEN": csrfToken,
           "Content-Type": "application/json",
@@ -398,7 +399,7 @@ export const useTripStore = defineStore("trip", {
 
   async addItineraryChecklist(checklist) {
     try {
-      await axios.get("http://localhost:8000/sanctum/csrf-cookie");
+      await axios.get(`${this.baseUrl}sanctum/csrf-cookie`);
   
       const snakeCaseData = _.mapKeys(checklist, (value, key) => _.snakeCase(key));
   
@@ -406,7 +407,7 @@ export const useTripStore = defineStore("trip", {
         document.cookie.split("; ").find((row) => row.startsWith("XSRF-TOKEN=")).split("=")[1]
       );
   
-      const response = await axios.post("http://localhost:8000/api/itinerary-checklists", snakeCaseData, {
+      const response = await axios.post(`${this.baseUrl}/api/itinerary-checklists`, snakeCaseData, {
         headers: {
           "X-XSRF-TOKEN": csrfToken,
           "Content-Type": "application/json",
@@ -427,7 +428,7 @@ export const useTripStore = defineStore("trip", {
         this.currentItinerary = null;
         this.itineraryDays = [];
 
-        const response = await axios.get("http://localhost:8000/api/itineraries", {
+        const response = await axios.get(`${this.baseUrl}/api/itineraries`, {
             params: { trip_id: tripId },
         });
 
@@ -460,7 +461,7 @@ export const useTripStore = defineStore("trip", {
   
   async updateItineraryDates(itineraryId, startDate, endDate) {
     try {
-      await axios.get("http://localhost:8000/sanctum/csrf-cookie");
+      await axios.get(`${this.baseUrl}sanctum/csrf-cookie`);
   
       const requestData = {
         start_date: startDate,
@@ -474,7 +475,7 @@ export const useTripStore = defineStore("trip", {
       );
   
       const response = await axios.patch(
-        `http://localhost:8000/api/itineraries/${itineraryId}`,
+        `${this.baseUrl}/api/itineraries/${itineraryId}`,
         snakeCaseData,
         {
           headers: {
@@ -495,7 +496,7 @@ export const useTripStore = defineStore("trip", {
 
   async updateItineraryNote(noteId, content) {
     try {
-      await axios.get("http://localhost:8000/sanctum/csrf-cookie");
+      await axios.get(`${this.baseUrl}sanctum/csrf-cookie`);
 
       const requestData = { content };
       const snakeCaseData = _.mapKeys(requestData, (value, key) => _.snakeCase(key));
@@ -505,7 +506,7 @@ export const useTripStore = defineStore("trip", {
       );
 
       const response = await axios.patch(
-        `http://localhost:8000/api/itinerary-notes/${noteId}`,
+        `${this.baseUrl}/api/itinerary-notes/${noteId}`,
         snakeCaseData,
         {
           headers: {
@@ -527,7 +528,7 @@ export const useTripStore = defineStore("trip", {
   
   async updateItineraryChecklist(checklistId, content, completed) {
     try {
-      await axios.get("http://localhost:8000/sanctum/csrf-cookie");
+      await axios.get(`${this.baseUrl}sanctum/csrf-cookie`);
 
       const requestData = { content, completed };
       const snakeCaseData = _.mapKeys(requestData, (value, key) => _.snakeCase(key));
@@ -537,7 +538,7 @@ export const useTripStore = defineStore("trip", {
       );
 
       const response = await axios.patch(
-        `http://localhost:8000/api/itinerary-checklists/${checklistId}`,
+        `${this.baseUrl}/api/itinerary-checklists/${checklistId}`,
         snakeCaseData,
         {
           headers: {
@@ -558,7 +559,7 @@ export const useTripStore = defineStore("trip", {
   
   async fetchItineraryPlaces(tripId) {
     try {
-      const response = await axios.get(`http://localhost:8000/api/itinerary-places/${tripId}`);
+      const response = await axios.get(`${this.baseUrl}/api/itinerary-places/${tripId}`);
       this.itineraryPlaces = response.data;
     } catch (error) {
       console.error("Error fetching itinerary places:", error);
@@ -567,7 +568,7 @@ export const useTripStore = defineStore("trip", {
   
   async addItineraryPlace(place) {
     try {
-        await axios.get("http://localhost:8000/sanctum/csrf-cookie");
+        await axios.get(`${this.baseUrl}sanctum/csrf-cookie`);
 
         const snakeCaseData = _.mapKeys(place, (value, key) => _.snakeCase(key));
 
@@ -575,7 +576,7 @@ export const useTripStore = defineStore("trip", {
             document.cookie.split("; ").find((row) => row.startsWith("XSRF-TOKEN=")).split("=")[1]
         );
 
-        const response = await axios.post("http://localhost:8000/api/itinerary-places", snakeCaseData, {
+        const response = await axios.post(`${this.baseUrl}/api/itinerary-places`, snakeCaseData, {
             headers: {
                 "X-XSRF-TOKEN": csrfToken,
                 "Content-Type": "application/json",
@@ -593,7 +594,7 @@ export const useTripStore = defineStore("trip", {
 
 async deleteItineraryPlace(placeId) {
     try {
-        await axios.delete(`http://localhost:8000/api/itinerary-places/${placeId}`, {
+        await axios.delete(`${this.baseUrl}/api/itinerary-places/${placeId}`, {
             withCredentials: true,
         });
         console.log("Itinerary place deleted successfully");
@@ -609,7 +610,7 @@ async deleteItineraryPlace(placeId) {
 
   async updateItemOrder(items) {
     try {
-      await axios.get("http://localhost:8000/sanctum/csrf-cookie");
+      await axios.get(`${this.baseUrl}sanctum/csrf-cookie`);
   
       const reorderedItems = items.map((item) => ({
         id: item.id,
@@ -622,7 +623,7 @@ async deleteItineraryPlace(placeId) {
       );
   
       const response = await axios.post(
-        "http://localhost:8000/api/itinerary-items/update-order",
+        `${this.baseUrl}/api/itinerary-items/update-order`,
         { items: reorderedItems },
         {
           headers: {
@@ -642,7 +643,7 @@ async deleteItineraryPlace(placeId) {
 
   async fetchBudget(tripId) {
     try {
-        const response = await axios.get(`http://localhost:8000/api/budgets/${tripId}`);
+        const response = await axios.get(`${this.baseUrl}/api/budgets/${tripId}`);
         const budget = response.data;
 
         this.currentBudgetId = budget.id;
@@ -661,7 +662,7 @@ async deleteItineraryPlace(placeId) {
 
 async addExpense(amount, category) {
   try {
-      await axios.get("http://localhost:8000/sanctum/csrf-cookie");
+      await axios.get(`${this.baseUrl}sanctum/csrf-cookie`);
 
       const requestData = {
           budget_id: this.currentBudgetId, // Upewnij się, że currentBudgetId jest ustawione
@@ -678,7 +679,7 @@ async addExpense(amount, category) {
       const snakeCaseData = _.mapKeys(requestData, (value, key) => _.snakeCase(key));
 
       const response = await axios.post(
-          "http://localhost:8000/api/expenses",
+          `${this.baseUrl}/api/expenses`,
           snakeCaseData,
           {
               headers: {
@@ -699,7 +700,7 @@ async addExpense(amount, category) {
 
 async createBudget(tripId, limit) {
   try {
-      await axios.get("http://localhost:8000/sanctum/csrf-cookie");
+      await axios.get(`${this.baseUrl}sanctum/csrf-cookie`);
 
       const requestData = {
           trip_id: tripId,
@@ -713,7 +714,7 @@ async createBudget(tripId, limit) {
       const snakeCaseData = _.mapKeys(requestData, (value, key) => _.snakeCase(key));
 
       const response = await axios.post(
-          "http://localhost:8000/api/budgets",
+          `${this.baseUrl}/api/budgets`,
           snakeCaseData,
           {
               headers: {
@@ -735,7 +736,7 @@ async createBudget(tripId, limit) {
 
 async updateBudget(tripId, newLimit) {
   try {
-      await axios.get("http://localhost:8000/sanctum/csrf-cookie");
+      await axios.get(`${this.baseUrl}sanctum/csrf-cookie`);
 
       const csrfToken = decodeURIComponent(
           document.cookie.split('; ')
@@ -744,7 +745,7 @@ async updateBudget(tripId, newLimit) {
       );
 
       const response = await axios.put(
-          `http://localhost:8000/api/budgets/${tripId}`, // Używamy tripId
+          `${this.baseUrl}/api/budgets/${tripId}`, // Używamy tripId
           { limit: newLimit },
           {
               headers: {
@@ -764,7 +765,7 @@ async updateBudget(tripId, newLimit) {
 
 async updateExpense(expenseId, updatedData) {
   try {
-    await axios.get("http://localhost:8000/sanctum/csrf-cookie");
+    await axios.get(`${this.baseUrl}sanctum/csrf-cookie`);
 
     const csrfToken = decodeURIComponent(
       document.cookie.split('; ')
@@ -773,7 +774,7 @@ async updateExpense(expenseId, updatedData) {
     );
 
     const response = await axios.put(
-      `http://localhost:8000/api/expenses/${expenseId}`,
+      `${this.baseUrl}/api/expenses/${expenseId}`,
       updatedData,
       {
         headers: {
@@ -804,7 +805,7 @@ async updateExpense(expenseId, updatedData) {
 
 async deleteExpense(expenseId) {
   try {
-    await axios.get("http://localhost:8000/sanctum/csrf-cookie");
+    await axios.get(`${this.baseUrl}sanctum/csrf-cookie`);
 
     const csrfToken = decodeURIComponent(
       document.cookie.split('; ')
@@ -812,7 +813,7 @@ async deleteExpense(expenseId) {
         .split('=')[1]
     );
 
-    await axios.delete(`http://localhost:8000/api/expenses/${expenseId}`, {
+    await axios.delete(`${this.baseUrl}/api/expenses/${expenseId}`, {
       headers: {
         'X-XSRF-TOKEN': csrfToken,
       },
@@ -837,7 +838,7 @@ async deleteExpense(expenseId) {
 
 async addFlightToTrip(flight) {
   try {
-    await axios.get("http://localhost:8000/sanctum/csrf-cookie");
+    await axios.get(`${this.baseUrl}sanctum/csrf-cookie`);
 
     const requestData = {
       trip_id: this.currentTripId,
@@ -863,7 +864,7 @@ async addFlightToTrip(flight) {
 
     const snakeCaseData = _.mapKeys(requestData, (value, key) => _.snakeCase(key));
 
-    const response = await axios.post("http://localhost:8000/api/flights", snakeCaseData, {
+    const response = await axios.post(`${this.baseUrl}/api/flights`, snakeCaseData, {
       headers: {
         "X-XSRF-TOKEN": csrfToken,
         "Content-Type": "application/json",
@@ -882,14 +883,14 @@ async addFlightToTrip(flight) {
 
 async deleteFlight(flightId) {
   try {
-    await axios.get("http://localhost:8000/sanctum/csrf-cookie"); // Pobierz CSRF cookie
+    await axios.get(`${this.baseUrl}sanctum/csrf-cookie`); // Pobierz CSRF cookie
 
     const csrfToken = decodeURIComponent(
       document.cookie.split("; ").find((row) => row.startsWith("XSRF-TOKEN=")).split("=")[1]
     );
 
     // Wysłanie żądania usunięcia lotu
-    await axios.delete(`http://localhost:8000/api/flights/${flightId}`, {
+    await axios.delete(`${this.baseUrl}/api/flights/${flightId}`, {
       headers: {
         "X-XSRF-TOKEN": csrfToken,
         "Content-Type": "application/json",
@@ -910,7 +911,7 @@ async deleteFlight(flightId) {
 
 async fetchFlights(tripId) {
   try {
-    const response = await axios.get("http://localhost:8000/api/flights", {
+    const response = await axios.get(`${this.baseUrl}/api/flights`, {
       params: { trip_id: tripId },
     });
     this.flights = response.data;
@@ -922,7 +923,7 @@ async fetchFlights(tripId) {
 
 async fetchApiKeys() {
   try {
-    const response = await axios.get('http://localhost:8000/api/get-api-key');
+    const response = await axios.get(`${this.baseUrl}/api/get-api-key`);
     return response.data; // Zwraca oba klucze jako obiekt
   }
   catch {

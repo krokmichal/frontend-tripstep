@@ -8,6 +8,7 @@ axios.defaults.withCredentials = true; // Włączenie obsługi ciasteczek sesji
 export const useAuthStore = defineStore("auth", {
   state: () => ({
     authUser: null, // Przechowuje dane zalogowanego użytkownika
+    baseUrl: import.meta.env.VITE_API_BASE_URL,
   }),
   getters: {
     user: (state) => state.authUser, // Getter do pobrania danych użytkownika
@@ -15,13 +16,13 @@ export const useAuthStore = defineStore("auth", {
   actions: {
     // Pobranie tokena CSRF do zabezpieczenia żądań
     async getToken() {
-      await axios.get("http://localhost:8000/sanctum/csrf-cookie");
+      await axios.get(`${this.baseUrl}/sanctum/csrf-cookie`);
     },
 
     // Pobranie danych zalogowanego użytkownika
     async getUser() {
       this.getToken(); // Upewnienie się, że mamy token CSRF
-      const data = await axios.get("http://localhost:8000/api/user");
+      const data = await axios.get(`${this.baseUrl}/api/user`);
       this.authUser = data.data; // Przypisanie danych użytkownika do stanu Pinia
     },
 
@@ -86,7 +87,7 @@ export const useAuthStore = defineStore("auth", {
           document.cookie.split("; ").find(row => row.startsWith("XSRF-TOKEN=")).split("=")[1]
         );
         // Wysłanie żądania usunięcia konta
-        await axios.delete("http://localhost:8000/api/delete-account", {
+        await axios.delete(`${this.baseUrl}/api/delete-account`, {
           data: { password }, // Przekazanie hasła w treści zapytania
           headers: {
             "X-XSRF-TOKEN": csrfToken, // Token CSRF wymagany do autoryzacji
