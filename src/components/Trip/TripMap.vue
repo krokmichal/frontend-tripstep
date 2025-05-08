@@ -45,7 +45,7 @@
   const placeDetails = ref(null);
   let map = null;
 
-  const myGoogleApiKey = import.meta.env.VITE_MY_GOOGLE_API_KEY;
+  const myGoogleApiKey = ref(null);
 
 
 
@@ -60,9 +60,14 @@
 
   // Inicjalizacja mapy po zamontowaniu komponentu
   onMounted(async () => {
+    const keys = await tripStore.fetchApiKeys();
+            if (keys) {
+                myGoogleApiKey.value = keys.google_api_key;
+              }
+
     // Tworzenie instancji Google Maps API Loader z kluczem API i biblioteką 'places'
     const loader = new Loader({
-      apiKey: myGoogleApiKey,
+      apiKey: myGoogleApiKey.value,
       libraries: ['places']
     });
 

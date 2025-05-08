@@ -204,7 +204,7 @@
 </template>
   
   <script setup>
-  import { ref, reactive } from "vue";
+  import { ref, reactive, onMounted } from "vue";
   import axios from "axios";
   import { useTripStore } from "../stores/TripStore";
 
@@ -250,7 +250,15 @@ const handleFlightSearch = async () => {
   }
 };
 
-const myApiKey = import.meta.env.VITE_MY_API_KEY;
+const myApiKey = ref(null);
+
+onMounted(async () => {
+  const keys = await tripStore.fetchApiKeys();
+            if (keys) {
+                myApiKey.value = keys.api_key;
+                
+}});
+
 const airportSuggestionsDeparture = ref([]); // Lista propozycji dla Departure City
 const airportSuggestionsArrival = ref([]); // Lista propozycji dla Arrival City
 
@@ -270,7 +278,7 @@ const handleAutoCompleteDeparture = async () => {
       placeTypes: "AIRPORT", // Wyszukiwanie tylko lotnisk
     },
     headers: {
-      "x-rapidapi-key": myApiKey,
+      "x-rapidapi-key": myApiKey.value,
       "x-rapidapi-host": "sky-scanner3.p.rapidapi.com",
     },
   };
@@ -303,7 +311,7 @@ const handleAutoCompleteArrival = async () => {
       placeTypes: "AIRPORT",
     },
     headers: {
-      "x-rapidapi-key": myApiKey,
+      "x-rapidapi-key": myApiKey.value,
       "x-rapidapi-host": "sky-scanner3.p.rapidapi.com",
     },
   };
@@ -345,7 +353,7 @@ const selectArrivalAirport = (skyId) => {
       adults: trip.value.numberOfPeople,
     },
     headers: {
-      "x-rapidapi-key": myApiKey,
+      "x-rapidapi-key": myApiKey.value,
       "x-rapidapi-host": "sky-scanner3.p.rapidapi.com",
     },
   };
@@ -361,7 +369,7 @@ const selectArrivalAirport = (skyId) => {
       adults: trip.value.numberOfPeople,
     },
     headers: {
-      "x-rapidapi-key": myApiKey,
+      "x-rapidapi-key": myApiKey.value,
       "x-rapidapi-host": "sky-scanner3.p.rapidapi.com",
     },
   };

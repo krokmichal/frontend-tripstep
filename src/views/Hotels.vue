@@ -125,17 +125,27 @@
   </template>
   
   <script setup>
-  import { ref, reactive } from 'vue';
+  import { ref, reactive, onMounted } from 'vue';
   import axios from 'axios';
   import { useTripStore } from '../stores/TripStore';
 
-  const myApiKey = import.meta.env.VITE_MY_API_KEY;
-  
   // Obiekt przechowujący przypisane hotele, aby oznaczyć, które hotele są już dodane do tripa
-  const assignedHotels = reactive({});
+   const assignedHotels = reactive({});
   
   // Pobranie store'a podróży
   const tripStore = useTripStore();
+
+  const myApiKey = ref(null);
+
+onMounted(async () => {
+  const keys = await tripStore.fetchApiKeys();
+            if (keys) {
+                myApiKey.value = keys.api_key;
+                
+}});  
+
+  
+
   
   // Reaktywne zmienne przechowujące dane wejściowe użytkownika dotyczące wyszukiwania hoteli
   const destination = ref('');
@@ -162,7 +172,7 @@
         url: 'https://tripadvisor16.p.rapidapi.com/api/v1/hotels/searchLocation',
         params: { query: destination.value }, // Parametr wyszukiwania to nazwa lokalizacji
         headers: {
-          'x-rapidapi-key': myApiKey, // Klucz API do autoryzacji
+          'x-rapidapi-key': myApiKey.value, // Klucz API do autoryzacji
           'x-rapidapi-host': 'tripadvisor16.p.rapidapi.com',
         },
       };
@@ -196,7 +206,7 @@
           rooms: rooms.value, // Liczba pokoi
         },
         headers: {
-          'x-rapidapi-key': myApiKey,
+          'x-rapidapi-key': myApiKey.value,
           'x-rapidapi-host': 'tripadvisor16.p.rapidapi.com',
         },
       };

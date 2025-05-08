@@ -920,32 +920,16 @@ async fetchFlights(tripId) {
   }
 },
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-  
-  
-  
-  
-  
-
-  
-  
-  
-  
+async fetchApiKeys() {
+  try {
+    const response = await axios.get('http://localhost:8000/api/get-api-key');
+    return response.data; // Zwraca oba klucze jako obiekt
+  }
+  catch {
+    console.error("Błąd podczas pobierania kluczy API:", error);
+    return null;
+  }
+}
   
   },
   
