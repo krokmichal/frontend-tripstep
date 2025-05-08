@@ -6,7 +6,7 @@ import vue from "@vitejs/plugin-vue";
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [vue()],
-  // base: "/frontend-tripstep",
+  base: "/frontend-tripstep",
   build: {
     outDir: 'docs' // zmienia katalog z 'dist' na 'docs'
 },
