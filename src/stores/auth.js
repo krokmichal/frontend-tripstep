@@ -16,7 +16,9 @@ export const useAuthStore = defineStore("auth", {
   actions: {
     // Pobranie tokena CSRF do zabezpieczenia żądań
     async getToken() {
-      await axios.get(`${this.baseUrl}/sanctum/csrf-cookie`);
+      await axios.get(`${this.baseUrl}/sanctum/csrf-cookie`, {
+        withCredentials: true
+      });   
     },
 
     // Pobranie danych zalogowanego użytkownika

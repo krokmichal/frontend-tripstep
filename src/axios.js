@@ -4,7 +4,8 @@
 import axios from 'axios';
 
 const instance = axios.create({
-  baseURL: '/api',
+  baseURL: 'https://backend-tripstep.onrender.com/api',
+  withCredentials: true,
 });
 
 instance.interceptors.request.use((config) => {
