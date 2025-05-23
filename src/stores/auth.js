@@ -46,6 +46,10 @@ export const useAuthStore = defineStore("auth", {
       await this.getToken(); 
       // Żądanie rejestracji z danymi z formularza
 
+       const csrfToken = decodeURIComponent(
+          document.cookie.split('; ').find(row => row.startsWith('XSRF-TOKEN=')).split('=')[1]
+        );
+
       await axios.post(`${this.baseUrl}/api/register`, { 
             headers: {
               'X-XSRF-TOKEN': csrfToken,
