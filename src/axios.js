@@ -1,10 +1,14 @@
-// axios.defaults.withCredentials = true;
+ axios.defaults.withCredentials = true;
 // axios.defaults.baseURL = "http://localhost:8000";
 
 import axios from 'axios';
 
 const instance = axios.create({
-  baseURL: '/api',
+//  baseURL: '/api',
+ baseURL:
+    import.meta.env.MODE === 'production'
+      ? 'https://backend-tripstep.onrender.com/api'
+      : 'http://localhost:8000/api',
 });
 
 instance.interceptors.request.use((config) => {
