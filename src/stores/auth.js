@@ -46,16 +46,7 @@ export const useAuthStore = defineStore("auth", {
       await this.getToken(); 
       // Żądanie rejestracji z danymi z formularza
 
-      const snakeCaseData = {};
-              for (const key in tripData) {
-                snakeCaseData[_.snakeCase(key)] = tripData[key]; // Użycie lodash
-              } 
-              const csrfToken = decodeURIComponent(
-                document.cookie.split('; ').find(row => row.startsWith('XSRF-TOKEN=')).split('=')[1]
-              );
-
-      await axios.post(`${this.baseUrl}/api/register`, { snakeCaseData,  // Dane przesyłane w formacie JSON
-          
+      await axios.post(`${this.baseUrl}/api/register`, { 
             headers: {
               'X-XSRF-TOKEN': csrfToken,
               'Content-Type': 'application/json' // Kluczowy nagłówek!
