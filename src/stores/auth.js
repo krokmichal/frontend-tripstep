@@ -31,7 +31,25 @@ export const useAuthStore = defineStore("auth", {
       // Pobranie tokena CSRF do zabezpieczenia żądań
       await this.getToken(); 
       // Żądanie logowania z danymi z formularza
+
+      const snakeCaseData = {};
+              for (const key in tripData) {
+                snakeCaseData[_.snakeCase(key)] = tripData[key]; // Użycie lodash
+              }
+              
+              
+              const csrfToken = decodeURIComponent(
+                document.cookie.split('; ').find(row => row.startsWith('XSRF-TOKEN=')).split('=')[1]
+              );
+
+
       await axios.post(`${this.baseUrl}/api/login`, {
+        snakeCaseData,  // Dane przesyłane w formacie JSON
+            headers: {
+              'X-XSRF-TOKEN': csrfToken,
+              'Content-Type': 'application/json' // Kluczowy nagłówek!
+            },
+            withCredentials: true,    
         email: data.email,
         password: data.password,
       });
@@ -54,7 +72,7 @@ export const useAuthStore = defineStore("auth", {
 
     // Wylogowanie użytkownika
     async logout() {
-      await axios.post("/api/logout"); // Wywołanie endpointu wylogowania
+      await axios.post(`${this.baseUrl}/api/logout`); // Wywołanie endpointu wylogowania
       this.authUser = null; // Wyczyszczenie danych użytkownika
       this.router.push("/"); 
     },
@@ -65,7 +83,7 @@ export const useAuthStore = defineStore("auth", {
       try {
         console.log('Wysyłanie żądania zmiany hasła:', passwordData);
         // Wysyłanie żądania POST do API z danymi hasła
-        const response = await axios.post("/api/api/change-password", {
+        const response = await axios.post(`${this.baseUrl}/api/api/change-password`, {
           current_password: passwordData.current_password,
           new_password: passwordData.new_password,
           new_password_confirmation: passwordData.new_password_confirmation,
