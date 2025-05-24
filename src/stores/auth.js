@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import axios from "axios";
-import instance from 'axios';
+import instance from '@/axios';
 
 // Konfiguracja Axios dla obsługi sesji i ciasteczek
 axios.defaults.withCredentials = true; // Włączenie obsługi ciasteczek sesji
@@ -16,12 +16,7 @@ export const useAuthStore = defineStore("auth", {
     user: (state) => state.authUser, // Getter do pobrania danych użytkownika
   },
   actions: {
-    // Pobranie tokena CSRF do zabezpieczenia żądań
-    // async getToken() {
-    //   await axios.get(`${this.baseUrl}/sanctum/csrf-cookie`, {
-    //     withCredentials: true
-    //   });   
-    // },
+   
     async getToken() {
   try {
     // Krok 1: Pobierz ciasteczka CSRF od backendu
@@ -46,6 +41,13 @@ export const useAuthStore = defineStore("auth", {
     console.error('Błąd podczas pobierania tokena CSRF:', error);
   }
 },
+
+ // Pobranie tokena CSRF do zabezpieczenia żądań
+    // async getToken() {
+    //   await axios.get(`${this.baseUrl}/sanctum/csrf-cookie`, {
+    //     withCredentials: true
+    //   });   
+    // },
 
 
     // Pobranie danych zalogowanego użytkownika
