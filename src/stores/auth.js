@@ -1,9 +1,11 @@
 import { defineStore } from "pinia";
 import axios from "axios";
+import instance from 'axios';
 
 // Konfiguracja Axios dla obsługi sesji i ciasteczek
 axios.defaults.withCredentials = true; // Włączenie obsługi ciasteczek sesji
 // axios.defaults.baseURL = "http://localhost:8000"; // Jeśli odkomentowane, może powodować problemy z logowaniem
+
 
 export const useAuthStore = defineStore("auth", {
   state: () => ({
@@ -23,7 +25,7 @@ export const useAuthStore = defineStore("auth", {
     async getToken() {
   try {
     // Krok 1: Pobierz ciasteczka CSRF od backendu
-    await axios.get(`${this.baseUrl}/sanctum/csrf-cookie`, {
+    await instance.get(`${this.baseUrl}/sanctum/csrf-cookie`, {
       withCredentials: true,
     });
 
@@ -36,7 +38,7 @@ export const useAuthStore = defineStore("auth", {
       const csrfToken = decodeURIComponent(csrfCookie.split('=')[1]);
 
       // Krok 3: Ustaw domyślny nagłówek we wszystkich przyszłych żądaniach
-      axios.defaults.headers.common['X-XSRF-TOKEN'] = csrfToken;
+      instance.defaults.headers.common['X-XSRF-TOKEN'] = csrfToken;
     } else {
       console.warn('Nie udało się znaleźć ciasteczka XSRF-TOKEN.');
     }
