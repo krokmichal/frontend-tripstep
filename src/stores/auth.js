@@ -1,6 +1,5 @@
 import { defineStore } from "pinia";
 import axios from "axios";
-import instance from '@/axios';
 
 // Konfiguracja Axios dla obsługi sesji i ciasteczek
 axios.defaults.withCredentials = true; // Włączenie obsługi ciasteczek sesji
@@ -19,9 +18,9 @@ export const useAuthStore = defineStore("auth", {
    
     async getToken() {
   try {
-    // Krok 1: Pobierz ciasteczka CSRF od backendu
-    await instance.get(`${this.baseUrl}/sanctum/csrf-cookie`, {
-      withCredentials: true,
+    // Krok 1: Pobierz ciasteczko XSRF-TOKEN od backendu
+    await axios.get(`${this.baseUrl}/sanctum/csrf-cookie`, {
+      withCredentials: true, // kluczowe!
     });
 
     // Krok 2: Ręcznie odczytaj XSRF-TOKEN z ciasteczka
@@ -33,7 +32,7 @@ export const useAuthStore = defineStore("auth", {
       const csrfToken = decodeURIComponent(csrfCookie.split('=')[1]);
 
       // Krok 3: Ustaw domyślny nagłówek we wszystkich przyszłych żądaniach
-      instance.defaults.headers.common['X-XSRF-TOKEN'] = csrfToken;
+      axios.defaults.headers.common['X-XSRF-TOKEN'] = csrfToken;
     } else {
       console.warn('Nie udało się znaleźć ciasteczka XSRF-TOKEN.');
     }
@@ -41,6 +40,7 @@ export const useAuthStore = defineStore("auth", {
     console.error('Błąd podczas pobierania tokena CSRF:', error);
   }
 },
+
 
  // Pobranie tokena CSRF do zabezpieczenia żądań
     // async getToken() {
@@ -80,7 +80,10 @@ export const useAuthStore = defineStore("auth", {
         email: data.email,
         password: data.password,
         password_confirmation: data.password_confirmation,
-      });
+      },
+    {
+      withCredentials: true,
+    });
       this.router.push("/"); // Przekierowanie na stronę główną
     },
 
