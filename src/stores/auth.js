@@ -15,11 +15,36 @@ export const useAuthStore = defineStore("auth", {
   },
   actions: {
     // Pobranie tokena CSRF do zabezpieczenia żądań
+    // async getToken() {
+    //   await axios.get(`${this.baseUrl}/sanctum/csrf-cookie`, {
+    //     withCredentials: true
+    //   });   
+    // },
     async getToken() {
-      await axios.get(`${this.baseUrl}/sanctum/csrf-cookie`, {
-        withCredentials: true
-      });   
-    },
+  try {
+    // Krok 1: Pobierz ciasteczka CSRF od backendu
+    await axios.get(`${this.baseUrl}/sanctum/csrf-cookie`, {
+      withCredentials: true,
+    });
+
+    // Krok 2: Ręcznie odczytaj XSRF-TOKEN z ciasteczka
+    const csrfCookie = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('XSRF-TOKEN='));
+
+    if (csrfCookie) {
+      const csrfToken = decodeURIComponent(csrfCookie.split('=')[1]);
+
+      // Krok 3: Ustaw domyślny nagłówek we wszystkich przyszłych żądaniach
+      axios.defaults.headers.common['X-XSRF-TOKEN'] = csrfToken;
+    } else {
+      console.warn('Nie udało się znaleźć ciasteczka XSRF-TOKEN.');
+    }
+  } catch (error) {
+    console.error('Błąd podczas pobierania tokena CSRF:', error);
+  }
+},
+
 
     // Pobranie danych zalogowanego użytkownika
     async getUser() {
