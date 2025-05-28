@@ -6,8 +6,6 @@ import axios from 'axios';
 const instance = axios.create({
   baseURL: '/api',
   withCredentials: true, // kluczowe!
-  xsrfCookieName: 'XSRF-TOKEN',
-  xsrfHeaderName: 'X-XSRF-TOKEN'
 });
 
 instance.interceptors.request.use((config) => {
