@@ -1,4 +1,4 @@
-// axios.defaults.withCredentials = true;
+axios.defaults.withCredentials = true;
 // axios.defaults.baseURL = "https://backend-tripstep.onrender.com";
 
 import axios from 'axios';
