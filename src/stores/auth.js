@@ -69,23 +69,49 @@ export const useAuthStore = defineStore("auth", {
       this.router.push("/"); // Przekierowanie na stronę główną 
     },
 
-    // Rejestracja nowego użytkownika
-    async handleRegister(data) {
-      // Pobranie tokena CSRF do zabezpieczenia żądań
-      await this.getToken(); 
-      // Żądanie rejestracji z danymi z formularza
+    
+    // async handleRegister(data) {
+    //   // Pobranie tokena CSRF do zabezpieczenia żądań
+    //   await this.getToken(); 
+    //   // Żądanie rejestracji z danymi z formularza
 
-      await axios.post(`${this.baseUrl}/api/register`, { 
-        name: data.name,
-        email: data.email,
-        password: data.password,
-        password_confirmation: data.password_confirmation,
-      },
-    {
-      withCredentials: true,
-    });
-      this.router.push("/"); // Przekierowanie na stronę główną
+    //   await axios.post(`${this.baseUrl}/api/register`, { 
+    //     name: data.name,
+    //     email: data.email,
+    //     password: data.password,
+    //     password_confirmation: data.password_confirmation,
+    //   },
+    // {
+    //   withCredentials: true,
+    // });
+    //   this.router.push("/"); // Przekierowanie na stronę główną
+    // },
+
+// Rejestracja nowego użytkownika
+async handleRegister(data) {
+  await this.getToken(); // CSRF token
+
+  const csrfCookie = document.cookie
+    .split('; ')
+    .find(row => row.startsWith('XSRF-TOKEN='));
+  const csrfToken = csrfCookie ? decodeURIComponent(csrfCookie.split('=')[1]) : '';
+
+  await axios.post(`${this.baseUrl}/api/register`, {
+    name: data.name,
+    email: data.email,
+    password: data.password,
+    password_confirmation: data.password_confirmation,
+  }, {
+    headers: {
+      'X-XSRF-TOKEN': csrfToken,
+      'Content-Type': 'application/json'
     },
+    withCredentials: true,
+  });
+
+  this.router.push("/"); // Przekierowanie
+},
+
 
     // Wylogowanie użytkownika
     async logout() {
