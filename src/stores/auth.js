@@ -62,7 +62,7 @@ export const useAuthStore = defineStore("auth", {
       // Pobranie tokena CSRF do zabezpieczenia żądań
       await this.getToken(); 
       // Żądanie logowania z danymi z formularza
-      await axios.post(`${this.baseUrl}/api/login`, {     
+      await axios.post(`${this.baseUrl}/login`, {     
         email: data.email,
         password: data.password,
       });
