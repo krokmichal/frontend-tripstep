@@ -44,7 +44,7 @@ export const useAuthStore = defineStore("auth", {
 
  // Pobranie tokena CSRF do zabezpieczenia żądań
     // async getToken() {
-    //   await axios.get(`${this.baseUrl}/sanctum/csrf-cookie`, {
+    //   await axios.get(`${this.baseUrl}sanctum/csrf-cookie`, {
     //     withCredentials: true
     //   });   
     // },
@@ -53,7 +53,7 @@ export const useAuthStore = defineStore("auth", {
     // Pobranie danych zalogowanego użytkownika
     async getUser() {
       this.getToken(); // Upewnienie się, że mamy token CSRF
-      const data = await axios.get(`${this.baseUrl}/api/user`);
+      const data = await axios.get(`${this.baseUrl}api/user`);
       this.authUser = data.data; // Przypisanie danych użytkownika do stanu Pinia
     },
 
@@ -75,7 +75,7 @@ export const useAuthStore = defineStore("auth", {
     //   await this.getToken(); 
     //   // Żądanie rejestracji z danymi z formularza
 
-    //   await axios.post(`${this.baseUrl}/api/register`, { 
+    //   await axios.post(`${this.baseUrl}api/register`, { 
     //     name: data.name,
     //     email: data.email,
     //     password: data.password,
@@ -96,7 +96,7 @@ async handleRegister(data) {
     .find(row => row.startsWith('XSRF-TOKEN='));
   const csrfToken = csrfCookie ? decodeURIComponent(csrfCookie.split('=')[1]) : '';
 
-  await axios.post(`${this.baseUrl}/api/register`, {
+  await axios.post(`${this.baseUrl}api/register`, {
     name: data.name,
     email: data.email,
     password: data.password,
@@ -115,7 +115,7 @@ async handleRegister(data) {
 
     // Wylogowanie użytkownika
     async logout() {
-      await axios.post(`${this.baseUrl}/api/logout`); // Wywołanie endpointu wylogowania
+      await axios.post(`${this.baseUrl}api/logout`); // Wywołanie endpointu wylogowania
       this.authUser = null; // Wyczyszczenie danych użytkownika
       this.router.push("/"); 
     },
@@ -126,7 +126,7 @@ async handleRegister(data) {
       try {
         console.log('Wysyłanie żądania zmiany hasła:', passwordData);
         // Wysyłanie żądania POST do API z danymi hasła
-        const response = await axios.post(`${this.baseUrl}/api/api/change-password`, {
+        const response = await axios.post(`${this.baseUrl}api/api/change-password`, {
           current_password: passwordData.current_password,
           new_password: passwordData.new_password,
           new_password_confirmation: passwordData.new_password_confirmation,
@@ -148,7 +148,7 @@ async handleRegister(data) {
           document.cookie.split("; ").find(row => row.startsWith("XSRF-TOKEN=")).split("=")[1]
         );
         // Wysłanie żądania usunięcia konta
-        await axios.delete(`${this.baseUrl}/api/delete-account`, {
+        await axios.delete(`${this.baseUrl}api/delete-account`, {
           data: { password }, // Przekazanie hasła w treści zapytania
           headers: {
             "X-XSRF-TOKEN": csrfToken, // Token CSRF wymagany do autoryzacji

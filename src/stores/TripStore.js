@@ -30,7 +30,7 @@ export const useTripStore = defineStore("trip", {
     async fetchTrips() {
       try {
         await axios.get(`${this.baseUrl}sanctum/csrf-cookie`);
-        const response = await axios.get(`${this.baseUrl}/api/trips`); // Pobieranie tripów
+        const response = await axios.get(`${this.baseUrl}api/trips`); // Pobieranie tripów
         // Poniżej konwersja z snake_case do camelCase podczas pobierania tripów z bazy, ponieważ w moim froncie wszystkie zmienne używają camelCase natomiast w bazie używany jest snake_case
         this.trips = response.data.map(trip => 
           _.mapKeys(trip, (value, key) => _.camelCase(key))
@@ -55,7 +55,7 @@ export const useTripStore = defineStore("trip", {
           document.cookie.split('; ').find(row => row.startsWith('XSRF-TOKEN=')).split('=')[1]
         );
         const response = await axios.post(
-          `${this.baseUrl}/api/trips`,
+          `${this.baseUrl}api/trips`,
           snakeCaseData,  // Dane przesyłane w formacie JSON
           {
             headers: {
@@ -82,7 +82,7 @@ export const useTripStore = defineStore("trip", {
           document.cookie.split('; ').find(row => row.startsWith('XSRF-TOKEN=')).split('=')[1]
         );
         // Wysłanie żądania DELETE w celu usunięcia wycieczki
-        await axios.delete(`${this.baseUrl}/api/trips/${tripId}`, {
+        await axios.delete(`${this.baseUrl}api/trips/${tripId}`, {
           headers: {
             'X-XSRF-TOKEN': csrfToken // Przekazanie tokena CSRF w nagłówkach żądania
           },
@@ -106,7 +106,7 @@ export const useTripStore = defineStore("trip", {
               document.cookie.split('; ').find(row => row.startsWith('XSRF-TOKEN=')).split('=')[1]
           );
   
-          const response = await axios.put(`${this.baseUrl}/api/trips/${tripData.id}`, snakeCaseData, {
+          const response = await axios.put(`${this.baseUrl}api/trips/${tripData.id}`, snakeCaseData, {
               headers: {
                   'X-XSRF-TOKEN': csrfToken,
                   'Content-Type': 'application/json'
@@ -147,7 +147,7 @@ export const useTripStore = defineStore("trip", {
         document.cookie.split('; ').find((row) => row.startsWith('XSRF-TOKEN=')).split('=')[1]
       );
   
-      const response = await axios.post(`${this.baseUrl}/api/places-to-visit`, snakeCaseData, {
+      const response = await axios.post(`${this.baseUrl}api/places-to-visit`, snakeCaseData, {
         headers: {
           'X-XSRF-TOKEN': csrfToken,
           'Content-Type': 'application/json',
@@ -171,7 +171,7 @@ export const useTripStore = defineStore("trip", {
 
   async fetchPlacesToVisit(tripId) {
     try {
-      const response = await axios.get(`${this.baseUrl}/api/places-to-visit`, {
+      const response = await axios.get(`${this.baseUrl}api/places-to-visit`, {
         params: { trip_id: tripId },
       });
   
@@ -192,7 +192,7 @@ export const useTripStore = defineStore("trip", {
 
   async fetchSingleTrip(tripId) {
     try {
-      const response = await axios.get(`${this.baseUrl}/api/trips/${tripId}`);
+      const response = await axios.get(`${this.baseUrl}api/trips/${tripId}`);
       const trip = _.mapKeys(response.data, (value, key) => _.camelCase(key));
       this.trips.push(trip); // Dodajemy do stanu, jeśli trip nie istnieje
       return trip;
@@ -211,7 +211,7 @@ export const useTripStore = defineStore("trip", {
         );
 
 
-      await axios.delete(`${this.baseUrl}/api/places-to-visit/${placeId}`,  {
+      await axios.delete(`${this.baseUrl}api/places-to-visit/${placeId}`,  {
         headers: {
           'X-XSRF-TOKEN': csrfToken
         },
@@ -239,7 +239,7 @@ export const useTripStore = defineStore("trip", {
           console.log(`Preparing to update place ${placeId} with data:`, snakeCaseData);
 
       const response = await axios.patch(
-        `${this.baseUrl}/api/places-to-visit/${placeId}`, snakeCaseData, {
+        `${this.baseUrl}api/places-to-visit/${placeId}`, snakeCaseData, {
           headers: {
               'X-XSRF-TOKEN': csrfToken,
               'Content-Type': 'application/json'
@@ -281,7 +281,7 @@ export const useTripStore = defineStore("trip", {
       const snakeCaseData = _.mapKeys(requestData, (value, key) => _.snakeCase(key));
       console.log("Request data after snakeCase transformation:", snakeCaseData);
   
-      const response = await axios.post(`${this.baseUrl}/api/hotels`, snakeCaseData, {
+      const response = await axios.post(`${this.baseUrl}api/hotels`, snakeCaseData, {
         headers: {
           'X-XSRF-TOKEN': csrfToken,
           'Content-Type': 'application/json',
@@ -299,7 +299,7 @@ export const useTripStore = defineStore("trip", {
 
   async fetchHotels(tripId) {
     try {
-      const response = await axios.get(`${this.baseUrl}/api/hotels`, {
+      const response = await axios.get(`${this.baseUrl}api/hotels`, {
         params: { trip_id: tripId },
       });
       this.hotels = response.data;
@@ -317,7 +317,7 @@ export const useTripStore = defineStore("trip", {
           document.cookie.split('; ').find(row => row.startsWith('XSRF-TOKEN=')).split('=')[1]
         );
 
-      await axios.delete(`${this.baseUrl}/api/hotels/${hotelId}`,   {
+      await axios.delete(`${this.baseUrl}api/hotels/${hotelId}`,   {
         headers: {
           'X-XSRF-TOKEN': csrfToken
         },
@@ -352,7 +352,7 @@ export const useTripStore = defineStore("trip", {
 
       // Wysyłanie żądania POST do API
       const response = await axios.post(
-        `${this.baseUrl}/api/itineraries`,
+        `${this.baseUrl}api/itineraries`,
         snakeCaseData, // Nie trzeba konwertować kluczy, jeśli API oczekuje snake_case
         {
           headers: {
@@ -381,7 +381,7 @@ export const useTripStore = defineStore("trip", {
         document.cookie.split("; ").find((row) => row.startsWith("XSRF-TOKEN=")).split("=")[1]
       );
   
-      const response = await axios.post(`${this.baseUrl}/api/itinerary-notes`, snakeCaseData, {
+      const response = await axios.post(`${this.baseUrl}api/itinerary-notes`, snakeCaseData, {
         headers: {
           "X-XSRF-TOKEN": csrfToken,
           "Content-Type": "application/json",
@@ -407,7 +407,7 @@ export const useTripStore = defineStore("trip", {
         document.cookie.split("; ").find((row) => row.startsWith("XSRF-TOKEN=")).split("=")[1]
       );
   
-      const response = await axios.post(`${this.baseUrl}/api/itinerary-checklists`, snakeCaseData, {
+      const response = await axios.post(`${this.baseUrl}api/itinerary-checklists`, snakeCaseData, {
         headers: {
           "X-XSRF-TOKEN": csrfToken,
           "Content-Type": "application/json",
@@ -428,7 +428,7 @@ export const useTripStore = defineStore("trip", {
         this.currentItinerary = null;
         this.itineraryDays = [];
 
-        const response = await axios.get(`${this.baseUrl}/api/itineraries`, {
+        const response = await axios.get(`${this.baseUrl}api/itineraries`, {
             params: { trip_id: tripId },
         });
 
@@ -475,7 +475,7 @@ export const useTripStore = defineStore("trip", {
       );
   
       const response = await axios.patch(
-        `${this.baseUrl}/api/itineraries/${itineraryId}`,
+        `${this.baseUrl}api/itineraries/${itineraryId}`,
         snakeCaseData,
         {
           headers: {
@@ -506,7 +506,7 @@ export const useTripStore = defineStore("trip", {
       );
 
       const response = await axios.patch(
-        `${this.baseUrl}/api/itinerary-notes/${noteId}`,
+        `${this.baseUrl}api/itinerary-notes/${noteId}`,
         snakeCaseData,
         {
           headers: {
@@ -538,7 +538,7 @@ export const useTripStore = defineStore("trip", {
       );
 
       const response = await axios.patch(
-        `${this.baseUrl}/api/itinerary-checklists/${checklistId}`,
+        `${this.baseUrl}api/itinerary-checklists/${checklistId}`,
         snakeCaseData,
         {
           headers: {
@@ -559,7 +559,7 @@ export const useTripStore = defineStore("trip", {
   
   async fetchItineraryPlaces(tripId) {
     try {
-      const response = await axios.get(`${this.baseUrl}/api/itinerary-places/${tripId}`);
+      const response = await axios.get(`${this.baseUrl}api/itinerary-places/${tripId}`);
       this.itineraryPlaces = response.data;
     } catch (error) {
       console.error("Error fetching itinerary places:", error);
@@ -576,7 +576,7 @@ export const useTripStore = defineStore("trip", {
             document.cookie.split("; ").find((row) => row.startsWith("XSRF-TOKEN=")).split("=")[1]
         );
 
-        const response = await axios.post(`${this.baseUrl}/api/itinerary-places`, snakeCaseData, {
+        const response = await axios.post(`${this.baseUrl}api/itinerary-places`, snakeCaseData, {
             headers: {
                 "X-XSRF-TOKEN": csrfToken,
                 "Content-Type": "application/json",
@@ -594,7 +594,7 @@ export const useTripStore = defineStore("trip", {
 
 async deleteItineraryPlace(placeId) {
     try {
-        await axios.delete(`${this.baseUrl}/api/itinerary-places/${placeId}`, {
+        await axios.delete(`${this.baseUrl}api/itinerary-places/${placeId}`, {
             withCredentials: true,
         });
         console.log("Itinerary place deleted successfully");
@@ -623,7 +623,7 @@ async deleteItineraryPlace(placeId) {
       );
   
       const response = await axios.post(
-        `${this.baseUrl}/api/itinerary-items/update-order`,
+        `${this.baseUrl}api/itinerary-items/update-order`,
         { items: reorderedItems },
         {
           headers: {
@@ -643,7 +643,7 @@ async deleteItineraryPlace(placeId) {
 
   async fetchBudget(tripId) {
     try {
-        const response = await axios.get(`${this.baseUrl}/api/budgets/${tripId}`);
+        const response = await axios.get(`${this.baseUrl}api/budgets/${tripId}`);
         const budget = response.data;
 
         this.currentBudgetId = budget.id;
@@ -679,7 +679,7 @@ async addExpense(amount, category) {
       const snakeCaseData = _.mapKeys(requestData, (value, key) => _.snakeCase(key));
 
       const response = await axios.post(
-          `${this.baseUrl}/api/expenses`,
+          `${this.baseUrl}api/expenses`,
           snakeCaseData,
           {
               headers: {
@@ -714,7 +714,7 @@ async createBudget(tripId, limit) {
       const snakeCaseData = _.mapKeys(requestData, (value, key) => _.snakeCase(key));
 
       const response = await axios.post(
-          `${this.baseUrl}/api/budgets`,
+          `${this.baseUrl}api/budgets`,
           snakeCaseData,
           {
               headers: {
@@ -745,7 +745,7 @@ async updateBudget(tripId, newLimit) {
       );
 
       const response = await axios.put(
-          `${this.baseUrl}/api/budgets/${tripId}`, // Używamy tripId
+          `${this.baseUrl}api/budgets/${tripId}`, // Używamy tripId
           { limit: newLimit },
           {
               headers: {
@@ -774,7 +774,7 @@ async updateExpense(expenseId, updatedData) {
     );
 
     const response = await axios.put(
-      `${this.baseUrl}/api/expenses/${expenseId}`,
+      `${this.baseUrl}api/expenses/${expenseId}`,
       updatedData,
       {
         headers: {
@@ -813,7 +813,7 @@ async deleteExpense(expenseId) {
         .split('=')[1]
     );
 
-    await axios.delete(`${this.baseUrl}/api/expenses/${expenseId}`, {
+    await axios.delete(`${this.baseUrl}api/expenses/${expenseId}`, {
       headers: {
         'X-XSRF-TOKEN': csrfToken,
       },
@@ -864,7 +864,7 @@ async addFlightToTrip(flight) {
 
     const snakeCaseData = _.mapKeys(requestData, (value, key) => _.snakeCase(key));
 
-    const response = await axios.post(`${this.baseUrl}/api/flights`, snakeCaseData, {
+    const response = await axios.post(`${this.baseUrl}api/flights`, snakeCaseData, {
       headers: {
         "X-XSRF-TOKEN": csrfToken,
         "Content-Type": "application/json",
@@ -890,7 +890,7 @@ async deleteFlight(flightId) {
     );
 
     // Wysłanie żądania usunięcia lotu
-    await axios.delete(`${this.baseUrl}/api/flights/${flightId}`, {
+    await axios.delete(`${this.baseUrl}api/flights/${flightId}`, {
       headers: {
         "X-XSRF-TOKEN": csrfToken,
         "Content-Type": "application/json",
@@ -911,7 +911,7 @@ async deleteFlight(flightId) {
 
 async fetchFlights(tripId) {
   try {
-    const response = await axios.get(`${this.baseUrl}/api/flights`, {
+    const response = await axios.get(`${this.baseUrl}api/flights`, {
       params: { trip_id: tripId },
     });
     this.flights = response.data;
@@ -923,7 +923,7 @@ async fetchFlights(tripId) {
 
 async fetchApiKeys() {
   try {
-    const response = await axios.get(`${this.baseUrl}/api/get-api-key`);
+    const response = await axios.get(`${this.baseUrl}api/get-api-key`);
     return response.data; // Zwraca oba klucze jako obiekt
   }
   catch {
