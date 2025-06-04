@@ -19,7 +19,7 @@ export const useAuthStore = defineStore("auth", {
     async getToken() {
   try {
     // Krok 1: Pobierz ciasteczko XSRF-TOKEN od backendu
-    await axios.get(`${this.baseUrl}/sanctum/csrf-cookie`, {
+    await axios.get(`${this.baseUrl}sanctum/csrf-cookie`, {
       withCredentials: true, // kluczowe!
     });
 
@@ -62,7 +62,7 @@ export const useAuthStore = defineStore("auth", {
       // Pobranie tokena CSRF do zabezpieczenia żądań
       await this.getToken(); 
       // Żądanie logowania z danymi z formularza
-      await axios.post(`${this.baseUrl}/login`, {     
+      await axios.post(`${this.baseUrl}login`, {     
         email: data.email,
         password: data.password,
       });
